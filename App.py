@@ -6,41 +6,25 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import plotly.express as px
 
-# --- Custom CSS for background and buttons ---
+# --- Custom CSS for a clean, light look and attractive buttons ---
 st.markdown("""
     <style>
-    body {
-        background-color: #18191A;
-        color: #E4E6EB;
-    }
-    .main {
-        background-color: #242526;
-        color: #E4E6EB;
-    }
-    .stApp {
-        background-color: #18191A;
-        color: #E4E6EB;
-    }
-    .stSidebar {
-        background-color: #242526 !important;
-        color: #E4E6EB !important;
-    }
     .stButton>button {
-        background-color: #3A3B3C;
-        color: #E4E6EB;
+        background-color: #1a73e8;
+        color: white;
         border-radius: 8px;
-        border: 1px solid #444;
+        border: 1px solid #1a73e8;
         font-weight: bold;
         transition: 0.2s;
+        margin-bottom: 0.5em;
     }
     .stButton>button:hover {
-        background-color: #4B4C4F;
+        background-color: #1761b0;
         color: #FFD700;
         border: 1px solid #FFD700;
     }
-    .css-1v0mbdj, .css-1d391kg, .css-1cpxqw2 { /* Dataframe and widget backgrounds */
-        background-color: #242526 !important;
-        color: #E4E6EB !important;
+    .stSidebar {
+        background-color: #f0f2f6 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -53,16 +37,25 @@ if data_source == "Upload Kragle Dataset":
     uploaded_file = st.sidebar.file_uploader("Upload CSV", type=["csv"])
     if uploaded_file:
         df = pd.read_csv(uploaded_file)
+        st.sidebar.success("Kragle dataset uploaded!")
     else:
         df = None
 else:
     ticker = st.sidebar.text_input("Enter Stock Ticker (e.g. AAPL)")
     if "yahoo_df" not in st.session_state:
         st.session_state["yahoo_df"] = None
-
-    if st.sidebar.button("Fetch Data") and ticker:
-        st.session_state["yahoo_df"] = yf.download(ticker, period="1y")
-
+    if st.sidebar.button("Fetch Data"):
+        if ticker:
+            with st.spinner(f"Fetching data for {ticker}..."):
+                data = yf.download(ticker, period="1y")
+                if data is not None and not data.empty:
+                    st.session_state["yahoo_df"] = data
+                    st.sidebar.success(f"Data for {ticker} loaded!")
+                else:
+                    st.session_state["yahoo_df"] = None
+                    st.sidebar.error("No data found for this ticker. Please check the symbol and try again.")
+        else:
+            st.sidebar.warning("Please enter a ticker symbol.")
     df = st.session_state["yahoo_df"]
 
 # --- Welcome Interface ---
@@ -85,22 +78,24 @@ if df is not None and not df.empty:
 
     if st.button("3️⃣ Feature Engineering"):
         st.write("Feature engineering step (customize as needed).")
-        # Example: st.write(df.describe())
+        st.write(df.describe())
 
     if st.button("4️⃣ Train/Test Split"):
         st.write("Splitting data...")
-        # For demonstration, assume 'Close' is the target if present
         if 'Close' in df.columns:
             X = df.drop('Close', axis=1).select_dtypes(include=[np.number])
             y = df['Close']
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-            st.success("Data split into train and test sets.")
-            fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)])
-            st.plotly_chart(fig)
-            st.session_state['X_train'] = X_train
-            st.session_state['X_test'] = X_test
-            st.session_state['y_train'] = y_train
-            st.session_state['y_test'] = y_test
+            if X.shape[1] == 0:
+                st.warning("No numeric features available for training. Please check your data.")
+            else:
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+                st.success("Data split into train and test sets.")
+                fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)])
+                st.plotly_chart(fig)
+                st.session_state['X_train'] = X_train
+                st.session_state['X_test'] = X_test
+                st.session_state['y_train'] = y_train
+                st.session_state['y_test'] = y_test
         else:
             st.warning("No 'Close' column found for regression. Please check your data.")
 
@@ -133,7 +128,6 @@ if df is not None and not df.empty:
         else:
             st.warning("Please train and evaluate the model first.")
 
-    # Bonus: Download results
     if st.button("⬇️ Download Results"):
         if 'model' in st.session_state and 'X_test' in st.session_state:
             y_pred = st.session_state['model'].predict(st.session_state['X_test'])
@@ -143,7 +137,7 @@ if df is not None and not df.empty:
         else:
             st.warning("No results to download.")
 else:
-    st.warning("Please upload a dataset or fetch data to begin.")
+    st.info("Please upload a dataset or fetch data to begin.")
 
 # --- Themed GIF at End ---
 st.markdown("---")
