@@ -9,8 +9,39 @@ import plotly.express as px
 # --- Custom CSS for background and buttons ---
 st.markdown("""
     <style>
-    .main {background-color: #f0f2f6;}
-    .stButton>button {background-color: #1a73e8; color: white;}
+    body {
+        background-color: #18191A;
+        color: #E4E6EB;
+    }
+    .main {
+        background-color: #242526;
+        color: #E4E6EB;
+    }
+    .stApp {
+        background-color: #18191A;
+        color: #E4E6EB;
+    }
+    .stSidebar {
+        background-color: #242526 !important;
+        color: #E4E6EB !important;
+    }
+    .stButton>button {
+        background-color: #3A3B3C;
+        color: #E4E6EB;
+        border-radius: 8px;
+        border: 1px solid #444;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    .stButton>button:hover {
+        background-color: #4B4C4F;
+        color: #FFD700;
+        border: 1px solid #FFD700;
+    }
+    .css-1v0mbdj, .css-1d391kg, .css-1cpxqw2 { /* Dataframe and widget backgrounds */
+        background-color: #242526 !important;
+        color: #E4E6EB !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -26,11 +57,13 @@ if data_source == "Upload Kragle Dataset":
         df = None
 else:
     ticker = st.sidebar.text_input("Enter Stock Ticker (e.g. AAPL)")
-    fetch_btn = st.sidebar.button("Fetch Data")
-    if fetch_btn and ticker:
-        df = yf.download(ticker, period="1y")
-    else:
-        df = None
+    if "yahoo_df" not in st.session_state:
+        st.session_state["yahoo_df"] = None
+
+    if st.sidebar.button("Fetch Data") and ticker:
+        st.session_state["yahoo_df"] = yf.download(ticker, period="1y")
+
+    df = st.session_state["yahoo_df"]
 
 # --- Welcome Interface ---
 st.title("💸 Financial ML App")
