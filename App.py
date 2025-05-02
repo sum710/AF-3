@@ -112,7 +112,7 @@ else:
     df = st.session_state["yahoo_df"]
 
 # --- Main App Title and Welcome ---
-st.image("https://media.giphy.com/media/LMt9638dO8dftAjtco/giphy.gif", width=350)  # Modern finance/stock market GIF
+st.image("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", width=350)  # Modern finance/stock market GIF
 st.markdown("""
 # 💸 <span style='color:#1a73e8'>Financial ML Dashboard</span>
 """, unsafe_allow_html=True)
@@ -238,7 +238,7 @@ if df is not None and not df.empty:
             st.plotly_chart(fig)
             progress.progress(100, text="Evaluation complete!")
             st.success("Model evaluation complete! 🎉")
-            st.image("https://media.giphy.com/media/LMt9638dO8dftAjtco/giphy.gif", width=350)  # Modern finance/stock market GIF
+            st.image("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", width=350)  # Modern finance/stock market GIF
         else:
             st.warning("Please train the model first.")
 
