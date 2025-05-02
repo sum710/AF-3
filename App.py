@@ -66,7 +66,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Sidebar Logo and Info ---
-st.sidebar.image("https://t3.ftcdn.net/jpg/10/74/36/12/360_F_1074361236_WFsSuncsKErHbezBRKkETMzUZCtMJ9Ua.jpg", width=80)  # Lady in finance (Adobe Stock)
+st.sidebar.image("https://images.pexels.com/photos/1181696/pexels-photo-1181696.jpeg?auto=compress&w=256&h=256&fit=facearea", width=80)  # Working Pexels lady in finance image
 st.sidebar.title("📊 Financial ML App")
 st.sidebar.markdown("""
 **Welcome!**
@@ -112,7 +112,7 @@ else:
     df = st.session_state["yahoo_df"]
 
 # --- Main App Title and Welcome ---
-st.image("https://media.giphy.com/media/AlCr2wBq4ZC0MamQUz/giphy.gif", width=350)  # Salesforce finance GIF
+st.image("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", width=350)  # Working Giphy finance GIF
 st.markdown("""
 # 💸 <span style='color:#1a73e8'>Financial ML Dashboard</span>
 """, unsafe_allow_html=True)
@@ -238,7 +238,7 @@ if df is not None and not df.empty:
             st.plotly_chart(fig)
             progress.progress(100, text="Evaluation complete!")
             st.success("Model evaluation complete! 🎉")
-            st.image("https://media.giphy.com/media/AlCr2wBq4ZC0MamQUz/giphy.gif", width=350)  # Salesforce finance GIF
+            st.image("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", width=350)  # Working Giphy finance GIF
         else:
             st.warning("Please train the model first.")
 
