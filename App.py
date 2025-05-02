@@ -101,27 +101,35 @@ if df is not None and not df.empty:
 
     if st.button("4️⃣ Train/Test Split", help="Split your data into training and testing sets."):
         st.write("Splitting data...")
-        if 'Close' in df.columns:
-            X = df.drop('Close', axis=1).select_dtypes(include=[np.number])
-            y = df['Close']
-            if X.shape[1] == 0:
-                st.warning("No numeric features available for training. Please check your data.")
-            else:
-                progress = st.progress(0, text="Splitting data...")
-                for percent in range(0, 101, 33):
-                    time.sleep(0.07)
-                    progress.progress(percent, text=f"Splitting... {percent}%")
-                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-                st.success("Data split into train and test sets.")
-                fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)])
-                st.plotly_chart(fig)
-                st.session_state['X_train'] = X_train
-                st.session_state['X_test'] = X_test
-                st.session_state['y_train'] = y_train
-                st.session_state['y_test'] = y_test
-                progress.progress(100, text="Split complete!")
+        numeric_cols = [col for col in df.columns if df[col].dtype in [np.float64, np.int64]]
+        if len(numeric_cols) == 0:
+            st.warning("No numeric columns found for regression. Please check your data.")
         else:
-            st.warning("No 'Close' column found for regression. Please check your data.")
+            target_col = st.selectbox(
+                "Select the target column for regression:",
+                options=numeric_cols,
+                help="Choose the column you want to predict (e.g., Close, Adj Close, etc.)"
+            )
+            if target_col:
+                X = df.drop(target_col, axis=1).select_dtypes(include=[np.number])
+                y = df[target_col]
+                if X.shape[1] == 0:
+                    st.warning("No numeric features available for training. Please check your data.")
+                else:
+                    progress = st.progress(0, text="Splitting data...")
+                    for percent in range(0, 101, 33):
+                        time.sleep(0.07)
+                        progress.progress(percent, text=f"Splitting... {percent}%")
+                    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+                    st.success("Data split into train and test sets.")
+                    fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)])
+                    st.plotly_chart(fig)
+                    st.session_state['X_train'] = X_train
+                    st.session_state['X_test'] = X_test
+                    st.session_state['y_train'] = y_train
+                    st.session_state['y_test'] = y_test
+                    st.session_state['target_col'] = target_col
+                    progress.progress(100, text="Split complete!")
 
     if st.button("5️⃣ Train Model", help="Train a Linear Regression model on your data."):
         if 'X_train' in st.session_state and 'y_train' in st.session_state:
