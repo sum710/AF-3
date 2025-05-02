@@ -7,7 +7,17 @@ from sklearn.linear_model import LinearRegression
 import plotly.express as px
 import time
 
-# --- Custom CSS for a clean, light look and attractive buttons ---
+# --- Sidebar Logo and Info ---
+st.sidebar.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=80)
+st.sidebar.title("📊 Financial ML App")
+st.sidebar.markdown("""
+**Welcome!**
+- Upload your own CSV (from Kaggle or elsewhere)
+- Or fetch real-time stock data from Yahoo Finance (e.g., AAPL)
+- If Yahoo fetch fails, download from [Yahoo Finance](https://finance.yahoo.com/) or [Kaggle](https://www.kaggle.com/datasets?search=stock+prices) and upload here.
+""")
+
+# --- Custom CSS for attractive buttons and headers ---
 st.markdown("""
     <style>
     .stButton>button {
@@ -30,14 +40,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Sidebar ---
-st.sidebar.title("📊 Data Input")
-st.sidebar.info("""
-You can:
-- Upload your own CSV (from Kaggle or elsewhere)
-- Fetch real-time stock data from Yahoo Finance (enter a valid ticker, e.g., AAPL)
-If Yahoo Finance fetch fails, you can manually download data from [Yahoo Finance](https://finance.yahoo.com/) or [Kaggle Datasets](https://www.kaggle.com/datasets?search=stock+prices) and upload it here.
-""")
+# --- Data Source Selection ---
 data_source = st.sidebar.radio(
     "Choose data source:",
     ("Upload Kragle Dataset", "Fetch Yahoo Finance Data"),
@@ -73,45 +76,53 @@ else:
             st.sidebar.warning("Please enter a ticker symbol.")
     df = st.session_state["yahoo_df"]
 
-# --- Welcome Interface ---
-st.title("💸 Financial ML App")
-st.markdown("#### Welcome to your interactive finance ML dashboard!")
+# --- Main App Title and Welcome ---
+st.markdown("""
+# 💸 Financial ML Dashboard
+---
+""")
 st.image("https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif", width=300)
-st.markdown("**Start by uploading a dataset or fetching stock data from Yahoo Finance.**")
+st.markdown(
+    "<span style='color:#1a73e8;font-size:20px'><b>Start by uploading a dataset or fetching stock data from Yahoo Finance.</b></span>",
+    unsafe_allow_html=True)
 
 # --- Step-by-Step ML Pipeline ---
 if df is not None and not df.empty:
     st.success("Data loaded successfully!")
-    if st.button("1️⃣ Preview Data", help="Show the first few rows of your data."):
-        st.dataframe(df.head())
-        st.info("Here is a preview of your data.")
+    st.markdown("---")
+    st.markdown("## 🧩 Step-by-Step ML Workflow")
 
-    if st.button("2️⃣ Preprocess Data", help="Remove missing values and clean your data."):
-        progress = st.progress(0, text="Preprocessing data...")
-        st.write("Missing values before:", df.isnull().sum().sum())
-        for percent in range(0, 101, 20):
-            time.sleep(0.1)
-            progress.progress(percent, text=f"Preprocessing... {percent}%")
-        df = df.dropna()
-        progress.progress(100, text="Preprocessing complete!")
-        st.success("Missing values removed.")
+    with st.expander("1️⃣ Preview Data", expanded=False):
+        if st.button("Show Data Preview", help="Show the first few rows of your data."):
+            st.dataframe(df.head())
+            st.info("Here is a preview of your data.")
 
-    if st.button("3️⃣ Feature Engineering", help="View summary statistics and features."):
-        progress = st.progress(0, text="Engineering features...")
-        for percent in range(0, 101, 25):
-            time.sleep(0.08)
-            progress.progress(percent, text=f"Engineering features... {percent}%")
-        st.write("Feature engineering step (customize as needed).")
-        st.write(df.describe())
-        progress.progress(100, text="Feature engineering complete!")
+    with st.expander("2️⃣ Preprocess Data", expanded=False):
+        if st.button("Preprocess Data", help="Remove missing values and clean your data."):
+            progress = st.progress(0, text="Preprocessing data...")
+            st.write("Missing values before:", df.isnull().sum().sum())
+            for percent in range(0, 101, 20):
+                time.sleep(0.1)
+                progress.progress(percent, text=f"Preprocessing... {percent}%")
+            df = df.dropna()
+            progress.progress(100, text="Preprocessing complete!")
+            st.success("Missing values removed.")
 
-    if st.button("4️⃣ Train/Test Split", help="Split your data into training and testing sets."):
-        st.write("Splitting data...")
+    with st.expander("3️⃣ Feature Engineering", expanded=False):
+        if st.button("Feature Engineering", help="View summary statistics and features."):
+            progress = st.progress(0, text="Engineering features...")
+            for percent in range(0, 101, 25):
+                time.sleep(0.08)
+                progress.progress(percent, text=f"Engineering features... {percent}%")
+            st.write("Feature engineering step (customize as needed).")
+            st.write(df.describe())
+            progress.progress(100, text="Feature engineering complete!")
+
+    with st.expander("4️⃣ Train/Test Split", expanded=False):
         numeric_cols = [col for col in df.columns if df[col].dtype in [np.float64, np.int64]]
         if len(numeric_cols) == 0:
             st.warning("No numeric columns found for regression. Please check your data.")
         else:
-            # Case-insensitive search for 'close' column
             close_candidates = [col for col in numeric_cols if col.lower() == 'close']
             default_col = close_candidates[0] if close_candidates else numeric_cols[0]
             target_col = st.selectbox(
@@ -120,7 +131,7 @@ if df is not None and not df.empty:
                 index=numeric_cols.index(default_col),
                 help="Choose the column you want to predict (e.g., Close, Adj Close, etc.)"
             )
-            if target_col:
+            if st.button("Split Data", help="Split your data into training and testing sets."):
                 X = df.drop(target_col, axis=1).select_dtypes(include=[np.number])
                 y = df[target_col]
                 if X.shape[1] == 0:
@@ -132,7 +143,7 @@ if df is not None and not df.empty:
                         progress.progress(percent, text=f"Splitting... {percent}%")
                     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
                     st.success("Data split into train and test sets.")
-                    fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)])
+                    fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)], title="Train/Test Split")
                     st.plotly_chart(fig)
                     st.session_state['X_train'] = X_train
                     st.session_state['X_test'] = X_test
@@ -141,59 +152,65 @@ if df is not None and not df.empty:
                     st.session_state['target_col'] = target_col
                     progress.progress(100, text="Split complete!")
 
-    if st.button("5️⃣ Train Model", help="Train a Linear Regression model on your data."):
-        if 'X_train' in st.session_state and 'y_train' in st.session_state:
-            progress = st.progress(0, text="Training model...")
-            for percent in range(0, 101, 25):
-                time.sleep(0.12)
-                progress.progress(percent, text=f"Training... {percent}%")
-            model = LinearRegression()
-            model.fit(st.session_state['X_train'], st.session_state['y_train'])
-            st.session_state['model'] = model
-            progress.progress(100, text="Model training complete!")
-            st.success("Linear Regression model trained!")
-            st.balloons()
-        else:
-            st.warning("Please split the data first.")
+    with st.expander("5️⃣ Train Model", expanded=False):
+        if st.button("Train Model", help="Train a Linear Regression model on your data."):
+            if 'X_train' in st.session_state and 'y_train' in st.session_state:
+                progress = st.progress(0, text="Training model...")
+                for percent in range(0, 101, 25):
+                    time.sleep(0.12)
+                    progress.progress(percent, text=f"Training... {percent}%")
+                model = LinearRegression()
+                model.fit(st.session_state['X_train'], st.session_state['y_train'])
+                st.session_state['model'] = model
+                progress.progress(100, text="Model training complete!")
+                st.success("Linear Regression model trained!")
+                st.balloons()
+            else:
+                st.warning("Please split the data first.")
 
-    if st.button("6️⃣ Evaluate Model", help="Evaluate the trained model's performance."):
-        if 'model' in st.session_state and 'X_test' in st.session_state and 'y_test' in st.session_state:
-            progress = st.progress(0, text="Evaluating model...")
-            for percent in range(0, 101, 20):
-                time.sleep(0.09)
-                progress.progress(percent, text=f"Evaluating... {percent}%")
-            y_pred = st.session_state['model'].predict(st.session_state['X_test'])
-            score = st.session_state['model'].score(st.session_state['X_test'], st.session_state['y_test'])
-            st.write(f"R2 Score: {score:.4f}")
-            fig = px.scatter(x=st.session_state['y_test'], y=y_pred, labels={'x':'Actual', 'y':'Predicted'}, title='Actual vs Predicted')
-            st.plotly_chart(fig)
-            progress.progress(100, text="Evaluation complete!")
-            st.snow()
-        else:
-            st.warning("Please train the model first.")
+    with st.expander("6️⃣ Evaluate Model", expanded=False):
+        if st.button("Evaluate Model", help="Evaluate the trained model's performance."):
+            if 'model' in st.session_state and 'X_test' in st.session_state and 'y_test' in st.session_state:
+                progress = st.progress(0, text="Evaluating model...")
+                for percent in range(0, 101, 20):
+                    time.sleep(0.09)
+                    progress.progress(percent, text=f"Evaluating... {percent}%")
+                y_pred = st.session_state['model'].predict(st.session_state['X_test'])
+                score = st.session_state['model'].score(st.session_state['X_test'], st.session_state['y_test'])
+                st.write(f"R2 Score: {score:.4f}")
+                fig = px.scatter(x=st.session_state['y_test'], y=y_pred, labels={'x':'Actual', 'y':'Predicted'}, title='Actual vs Predicted')
+                st.plotly_chart(fig)
+                progress.progress(100, text="Evaluation complete!")
+                st.success("Model evaluation complete!")
+                st.markdown("<span style='color:green;font-size:18px'><b>🎉 Congratulations! Your model is ready.</b></span>", unsafe_allow_html=True)
+                st.snow()
+            else:
+                st.warning("Please train the model first.")
 
-    if st.button("7️⃣ Visualize Results", help="Visualize predictions vs. actual values."):
-        if 'model' in st.session_state and 'X_test' in st.session_state:
-            y_pred = st.session_state['model'].predict(st.session_state['X_test'])
-            result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
-            st.dataframe(result_df.head())
-            fig = px.line(result_df, title='Actual vs Predicted (Line Chart)')
-            st.plotly_chart(fig)
-        else:
-            st.warning("Please train and evaluate the model first.")
+    with st.expander("7️⃣ Visualize Results", expanded=False):
+        if st.button("Visualize Results", help="Visualize predictions vs. actual values."):
+            if 'model' in st.session_state and 'X_test' in st.session_state:
+                y_pred = st.session_state['model'].predict(st.session_state['X_test'])
+                result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
+                st.dataframe(result_df.head())
+                fig = px.line(result_df, title='Actual vs Predicted (Line Chart)')
+                st.plotly_chart(fig)
+            else:
+                st.warning("Please train and evaluate the model first.")
 
-    if st.button("⬇️ Download Results", help="Download the predictions as a CSV file."):
-        if 'model' in st.session_state and 'X_test' in st.session_state:
-            y_pred = st.session_state['model'].predict(st.session_state['X_test'])
-            result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
-            csv = result_df.to_csv(index=False).encode('utf-8')
-            st.download_button("Download CSV", csv, "results.csv")
-        else:
-            st.warning("No results to download.")
+    with st.expander("⬇️ Download Results", expanded=False):
+        if st.button("Download Results", help="Download the predictions as a CSV file."):
+            if 'model' in st.session_state and 'X_test' in st.session_state:
+                y_pred = st.session_state['model'].predict(st.session_state['X_test'])
+                result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
+                csv = result_df.to_csv(index=False).encode('utf-8')
+                st.download_button("Download CSV", csv, "results.csv")
+            else:
+                st.warning("No results to download.")
 else:
     st.info("Please upload a dataset or fetch data to begin.")
 
 # --- Themed GIF at End ---
 st.markdown("---")
 st.image("https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif", width=200)
-st.markdown("**Thank you for using the Financial ML App!**") 
+st.markdown("<span style='color:#1a73e8;font-size:18px'><b>Thank you for using the Financial ML App!</b></span>", unsafe_allow_html=True) 
