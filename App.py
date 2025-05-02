@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 import plotly.express as px
 
-# --- Custom CSS for background, buttons, and vertical layout ---
+# --- Custom CSS for background, buttons, and horizontal layout ---
 st.markdown("""
     <style>
     .stButton>button {
@@ -16,10 +16,10 @@ st.markdown("""
         border: 1px solid #1a73e8;
         font-weight: bold;
         transition: 0.2s;
-        display: block;
-        width: 100%;
+        display: inline-block;
+        margin-right: 0.5em;
         margin-bottom: 0.5em;
-        padding: 0.5em;
+        padding: 0.5em 1em;
     }
     .stButton>button:hover {
         background-color: #1761b0;
@@ -68,14 +68,14 @@ else:
 # --- Welcome Interface ---
 st.title("💸 Financial ML App")
 st.markdown("#### Welcome to your interactive finance ML dashboard!")
-st.image("https://media.giphy.com/media/l0Iyl55kTeh71nTWw/giphy.gif", width=300)
+st.image("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", width=300)
 st.markdown("**Start by uploading a dataset or fetching stock data from Yahoo Finance.**")
 
 # --- Step-by-Step ML Pipeline ---
 if df is not None and not df.empty:
     st.success("Data loaded successfully!")
     
-    # Vertical pipeline buttons
+    # Horizontal pipeline buttons
     st.header("Machine Learning Pipeline")
     
     if st.button("1️⃣ Preview Data"):
@@ -171,4 +171,4 @@ else:
 
 # --- Footer ---
 st.markdown("---")
-st.markdown("Developed by Sumbal Murtaza for AF3005 – Programming for Finance, Spring 2025")
+st.markdown("Developed by [Your Name] for AF3005 – Programming for Finance, Spring 2025")
