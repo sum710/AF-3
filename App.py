@@ -31,8 +31,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Sidebar ---
-st.sidebar.image("https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=facearea&w=256&h=256&q=80", width=80)
-st.sidebar.title("📊 Financial ML App")
+st.sidebar.image("https://images.unsplash.com/photo-1519340333755-c6e2a6a1b49a?auto=format&fit=facearea&w=256&h=256&q=80", width=80)
+st.sidebar.title("Financial ML App")
 data_source = st.sidebar.radio(
     "Choose data source:",
     ("Upload Kragle Dataset", "Fetch Yahoo Finance Data"),
@@ -69,14 +69,14 @@ else:
     df = st.session_state["yahoo_df"]
 
 # --- Welcome Interface ---
-st.title("💸 Financial ML App")
+st.title("Financial ML App")
 st.markdown("#### Welcome to your interactive finance ML dashboard!")
 st.image("https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif", width=300)
-st.markdown("**Start by uploading a dataset or fetching stock data from Yahoo Finance.**")
+st.markdown("Start by uploading a dataset or fetching stock data from Yahoo Finance.")
 
 # --- Quick Data Summary Charts (if data loaded and target selected) ---
 if 'target_col' in st.session_state and df is not None and not df.empty:
-    st.markdown("## 📊 Quick Data Overview")
+    st.markdown("## Quick Data Overview")
     col1, col2 = st.columns(2)
     target_col = st.session_state['target_col']
     with col1:
@@ -92,23 +92,31 @@ if 'target_col' in st.session_state and df is not None and not df.empty:
         st.markdown(f"#### {target_col} Distribution")
         st.bar_chart(df[target_col].value_counts().sort_index() if df[target_col].nunique() < 30 else df[target_col])
 
-# --- Step-by-Step ML Pipeline ---
+# --- Step-by-Step ML Pipeline (Vertical, Professional) ---
 if df is not None and not df.empty:
     st.success("Data loaded successfully!")
-    if st.button("1️⃣ Preview Data", help="Show the first few rows of your data."):
+    st.markdown("---")
+    st.header("1. Preview Data")
+    if st.button("Preview Data", help="Show the first few rows of your data."):
         st.dataframe(df.head())
         st.info("Here is a preview of your data.")
 
-    if st.button("2️⃣ Preprocess Data", help="Remove missing values and clean your data."):
+    st.markdown("---")
+    st.header("2. Preprocessing")
+    if st.button("Preprocess Data", help="Remove missing values and clean your data."):
         st.write("Missing values before:", df.isnull().sum().sum())
         df = df.dropna()
         st.success("Missing values removed.")
 
-    if st.button("3️⃣ Feature Engineering", help="View summary statistics and features."):
+    st.markdown("---")
+    st.header("3. Feature Engineering")
+    if st.button("Feature Engineering", help="View summary statistics and features."):
         st.write("Feature engineering step (customize as needed).")
         st.write(df.describe())
 
-    if st.button("4️⃣ Train/Test Split", help="Split your data into training and testing sets."):
+    st.markdown("---")
+    st.header("4. Train/Test Split")
+    if st.button("Train/Test Split", help="Split your data into training and testing sets."):
         st.write("Splitting data...")
         numeric_cols = [col for col in df.columns if df[col].dtype in [np.float64, np.int64]]
         if len(numeric_cols) == 0:
@@ -137,28 +145,34 @@ if df is not None and not df.empty:
                 st.session_state['y_test'] = y_test
                 st.session_state['target_col'] = target_col
 
-    if st.button("5️⃣ Train Model", help="Train a Linear Regression model on your data."):
+    st.markdown("---")
+    st.header("5. Train Model")
+    if st.button("Train Model", help="Train a Linear Regression model on your data."):
         if 'X_train' in st.session_state and 'y_train' in st.session_state:
             model = LinearRegression()
             model.fit(st.session_state['X_train'], st.session_state['y_train'])
             st.session_state['model'] = model
-            st.success("💹 Model trained! Ready to make financial predictions.")
+            st.success("Model trained! Ready to make financial predictions.")
         else:
             st.warning("Please split the data first.")
 
-    if st.button("6️⃣ Evaluate Model", help="Evaluate the trained model's performance."):
+    st.markdown("---")
+    st.header("6. Evaluate Model")
+    if st.button("Evaluate Model", help="Evaluate the trained model's performance."):
         if 'model' in st.session_state and 'X_test' in st.session_state and 'y_test' in st.session_state:
             y_pred = st.session_state['model'].predict(st.session_state['X_test'])
             score = st.session_state['model'].score(st.session_state['X_test'], st.session_state['y_test'])
             st.write(f"R2 Score: {score:.4f}")
             fig = px.scatter(x=st.session_state['y_test'], y=y_pred, labels={'x':'Actual', 'y':'Predicted'}, title='Actual vs Predicted')
             st.plotly_chart(fig)
-            st.success("Model evaluation complete! 🎉")
+            st.success("Model evaluation complete!")
             st.image("https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif", width=300)
         else:
             st.warning("Please train the model first.")
 
-    if st.button("7️⃣ Visualize Results", help="Visualize predictions vs. actual values."):
+    st.markdown("---")
+    st.header("7. Visualize Results")
+    if st.button("Visualize Results", help="Visualize predictions vs. actual values."):
         if 'model' in st.session_state and 'X_test' in st.session_state:
             y_pred = st.session_state['model'].predict(st.session_state['X_test'])
             result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
@@ -168,7 +182,9 @@ if df is not None and not df.empty:
         else:
             st.warning("Please train and evaluate the model first.")
 
-    if st.button("⬇️ Download Results", help="Download the predictions as a CSV file."):
+    st.markdown("---")
+    st.header("8. Download Results")
+    if st.button("Download Results", help="Download the predictions as a CSV file."):
         if 'model' in st.session_state and 'X_test' in st.session_state:
             y_pred = st.session_state['model'].predict(st.session_state['X_test'])
             result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
