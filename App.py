@@ -66,7 +66,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Sidebar Logo and Info ---
-st.sidebar.image("https://images.pexels.com/photos/1181696/pexels-photo-1181696.jpeg?auto=compress&w=256&h=256&fit=facearea", width=80)  # Professional lady in finance (Pexels)
+st.sidebar.image("https://www.google.com/imgres?q=lady%20image%20for%20ml%20finance%20app&imgurl=https%3A%2F%2Ft3.ftcdn.net%2Fjpg%2F10%2F74%2F36%2F12%2F360_F_1074361236_WFsSuncsKErHbezBRKkETMzUZCtMJ9Ua.jpg&imgrefurl=https%3A%2F%2Fstock.adobe.com%2Fsearch%3Fk%3Dfinancial%2520literacy%2520women&docid=mffKTbaivr1apM&tbnid=jGQcT4oeShVRIM&vet=12ahUKEwjtovS8m4WNAxXq-AIHHYjxIJ0QM3oECGEQAA..i&w=540&h=360&hcb=2&ved=2ahUKEwjtovS8m4WNAxXq-AIHHYjxIJ0QM3oECGEQAA", width=80)  # Professional lady in finance (Pexels)
 st.sidebar.title("📊 Financial ML App")
 st.sidebar.markdown("""
 **Welcome!**
@@ -112,7 +112,7 @@ else:
     df = st.session_state["yahoo_df"]
 
 # --- Main App Title and Welcome ---
-st.image("https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif", width=350)  # Modern finance/stock market GIF
+st.image("https://www.google.com/url?sa=i&url=https%3A%2F%2Fgiphy.com%2Fgifs%2Fsalesforce-finance-banking-financial-literacy-AlCr2wBq4ZC0MamQUz&psig=AOvVaw1DZIJPCGuA9JqAbzx2dITg&ust=1746290244961000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCOCkgaGchY0DFQAAAAAdAAAAABAR", width=350)  # Modern finance/stock market GIF
 st.markdown("""
 # 💸 <span style='color:#1a73e8'>Financial ML Dashboard</span>
 """, unsafe_allow_html=True)
