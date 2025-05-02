@@ -7,18 +7,9 @@ from sklearn.linear_model import LinearRegression
 import plotly.express as px
 import time
 
-# --- Custom CSS for sidebar, cards, buttons, and hover effects ---
+# --- Custom CSS for attractive buttons ---
 st.markdown("""
     <style>
-    .css-1d391kg, .css-1v0mbdj, .css-1cpxqw2 {
-        background-color: #f7fafd !important;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(30, 64, 175, 0.08);
-    }
-    .stSidebar {
-        background: linear-gradient(135deg, #e3f0ff 0%, #f7fafd 100%) !important;
-        box-shadow: 2px 0 8px rgba(30, 64, 175, 0.10);
-    }
     .stButton>button {
         background-color: #1a73e8;
         color: white;
@@ -32,50 +23,16 @@ st.markdown("""
         background-color: #1761b0;
         color: #FFD700;
         border: 1px solid #FFD700;
-        box-shadow: 0 2px 8px #1a73e8;
     }
-    .stTabs [data-baseweb="tab"] {
-        font-size: 18px;
-        font-weight: bold;
-        color: #1a73e8;
-    }
-    .stTabs [aria-selected="true"] {
-        background: #e3f0ff;
-        border-radius: 8px 8px 0 0;
-    }
-    .custom-card {
-        background: #e3f0ff;
-        border-radius: 16px;
-        padding: 1.5em;
-        box-shadow: 0 2px 12px rgba(30, 64, 175, 0.10);
-        margin-bottom: 1.5em;
-    }
-    .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background: #e3f0ff;
-        color: #1a73e8;
-        text-align: center;
-        padding: 0.5em 0;
-        font-size: 16px;
-        border-top: 1px solid #b3d1f7;
+    .stSidebar {
+        background-color: #f0f2f6 !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- Sidebar Logo and Info ---
-st.sidebar.image("https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=facearea&w=256&h=256&q=80", width=80)  # Unsplash businesswoman in finance
+# --- Sidebar ---
+st.sidebar.image("https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=facearea&w=256&h=256&q=80", width=80)
 st.sidebar.title("📊 Financial ML App")
-st.sidebar.markdown("""
-**Welcome!**
-- Upload your own CSV (from Kaggle or elsewhere)
-- Or fetch real-time stock data from Yahoo Finance (e.g., AAPL)
-- If Yahoo fetch fails, download from [Yahoo Finance](https://finance.yahoo.com/) or [Kaggle](https://www.kaggle.com/datasets?search=stock+prices) and upload here.
-""")
-
-# --- Data Source Selection ---
 data_source = st.sidebar.radio(
     "Choose data source:",
     ("Upload Kragle Dataset", "Fetch Yahoo Finance Data"),
@@ -111,18 +68,11 @@ else:
             st.sidebar.warning("Please enter a ticker symbol.")
     df = st.session_state["yahoo_df"]
 
-# --- Main App Title and Welcome ---
-st.image("https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif", width=350)  # Modern, interactive finance/stock market GIF
-st.markdown("""
-# 💸 <span style='color:#1a73e8'>Financial ML Dashboard</span>
-""", unsafe_allow_html=True)
-st.markdown("""
-<div class='custom-card'>
-    <span style='font-size:22px;color:#1a73e8'><b>Welcome to your interactive finance ML dashboard!</b></span><br>
-    <span style='font-size:16px;'>Start by uploading a dataset or fetching stock data from Yahoo Finance.<br>
-    Step through the workflow tabs below to build and evaluate your model.</span>
-</div>
-""", unsafe_allow_html=True)
+# --- Welcome Interface ---
+st.title("💸 Financial ML App")
+st.markdown("#### Welcome to your interactive finance ML dashboard!")
+st.image("https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif", width=300)
+st.markdown("**Start by uploading a dataset or fetching stock data from Yahoo Finance.**")
 
 # --- Quick Data Summary Charts (if data loaded and target selected) ---
 if 'target_col' in st.session_state and df is not None and not df.empty:
@@ -142,41 +92,24 @@ if 'target_col' in st.session_state and df is not None and not df.empty:
         st.markdown(f"#### {target_col} Distribution")
         st.bar_chart(df[target_col].value_counts().sort_index() if df[target_col].nunique() < 30 else df[target_col])
 
-# --- Step-by-Step ML Pipeline in Tabs ---
+# --- Step-by-Step ML Pipeline ---
 if df is not None and not df.empty:
     st.success("Data loaded successfully!")
-    tabs = st.tabs([
-        "1️⃣ Preview Data", "2️⃣ Preprocess Data", "3️⃣ Feature Engineering", "4️⃣ Train/Test Split", "5️⃣ Train Model", "6️⃣ Evaluate Model", "7️⃣ Visualize Results", "⬇️ Download Results"
-    ])
-
-    with tabs[0]:
-        st.markdown("### 1️⃣ Preview Data")
+    if st.button("1️⃣ Preview Data", help="Show the first few rows of your data."):
         st.dataframe(df.head())
         st.info("Here is a preview of your data.")
 
-    with tabs[1]:
-        st.markdown("### 2️⃣ Preprocess Data")
+    if st.button("2️⃣ Preprocess Data", help="Remove missing values and clean your data."):
         st.write("Missing values before:", df.isnull().sum().sum())
-        progress = st.progress(0, text="Preprocessing data...")
-        for percent in range(0, 101, 20):
-            time.sleep(0.1)
-            progress.progress(percent, text=f"Preprocessing... {percent}%")
         df = df.dropna()
-        progress.progress(100, text="Preprocessing complete!")
         st.success("Missing values removed.")
 
-    with tabs[2]:
-        st.markdown("### 3️⃣ Feature Engineering")
-        progress = st.progress(0, text="Engineering features...")
-        for percent in range(0, 101, 25):
-            time.sleep(0.08)
-            progress.progress(percent, text=f"Engineering features... {percent}%")
+    if st.button("3️⃣ Feature Engineering", help="View summary statistics and features."):
         st.write("Feature engineering step (customize as needed).")
         st.write(df.describe())
-        progress.progress(100, text="Feature engineering complete!")
 
-    with tabs[3]:
-        st.markdown("### 4️⃣ Train/Test Split")
+    if st.button("4️⃣ Train/Test Split", help="Split your data into training and testing sets."):
+        st.write("Splitting data...")
         numeric_cols = [col for col in df.columns if df[col].dtype in [np.float64, np.int64]]
         if len(numeric_cols) == 0:
             st.warning("No numeric columns found for regression. Please check your data.")
@@ -194,56 +127,38 @@ if df is not None and not df.empty:
             if X.shape[1] == 0:
                 st.warning("No numeric features available for training. Please check your data.")
             else:
-                progress = st.progress(0, text="Splitting data...")
-                for percent in range(0, 101, 33):
-                    time.sleep(0.07)
-                    progress.progress(percent, text=f"Splitting... {percent}%")
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
                 st.success("Data split into train and test sets.")
-                fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)], title="Train/Test Split")
+                fig = px.pie(names=["Train", "Test"], values=[len(X_train), len(X_test)])
                 st.plotly_chart(fig)
                 st.session_state['X_train'] = X_train
                 st.session_state['X_test'] = X_test
                 st.session_state['y_train'] = y_train
                 st.session_state['y_test'] = y_test
                 st.session_state['target_col'] = target_col
-                progress.progress(100, text="Split complete!")
 
-    with tabs[4]:
-        st.markdown("### 5️⃣ Train Model")
+    if st.button("5️⃣ Train Model", help="Train a Linear Regression model on your data."):
         if 'X_train' in st.session_state and 'y_train' in st.session_state:
-            progress = st.progress(0, text="Training model...")
-            for percent in range(0, 101, 25):
-                time.sleep(0.12)
-                progress.progress(percent, text=f"Training... {percent}%")
             model = LinearRegression()
             model.fit(st.session_state['X_train'], st.session_state['y_train'])
             st.session_state['model'] = model
-            progress.progress(100, text="Model training complete!")
             st.success("💹 Model trained! Ready to make financial predictions.")
         else:
             st.warning("Please split the data first.")
 
-    with tabs[5]:
-        st.markdown("### 6️⃣ Evaluate Model")
+    if st.button("6️⃣ Evaluate Model", help="Evaluate the trained model's performance."):
         if 'model' in st.session_state and 'X_test' in st.session_state and 'y_test' in st.session_state:
-            progress = st.progress(0, text="Evaluating model...")
-            for percent in range(0, 101, 20):
-                time.sleep(0.09)
-                progress.progress(percent, text=f"Evaluating... {percent}%")
             y_pred = st.session_state['model'].predict(st.session_state['X_test'])
             score = st.session_state['model'].score(st.session_state['X_test'], st.session_state['y_test'])
             st.write(f"R2 Score: {score:.4f}")
             fig = px.scatter(x=st.session_state['y_test'], y=y_pred, labels={'x':'Actual', 'y':'Predicted'}, title='Actual vs Predicted')
             st.plotly_chart(fig)
-            progress.progress(100, text="Evaluation complete!")
             st.success("Model evaluation complete! 🎉")
-            st.image("https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif", width=350)  # Modern, interactive finance/stock market GIF
+            st.image("https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif", width=300)
         else:
             st.warning("Please train the model first.")
 
-    with tabs[6]:
-        st.markdown("### 7️⃣ Visualize Results")
+    if st.button("7️⃣ Visualize Results", help="Visualize predictions vs. actual values."):
         if 'model' in st.session_state and 'X_test' in st.session_state:
             y_pred = st.session_state['model'].predict(st.session_state['X_test'])
             result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
@@ -253,8 +168,7 @@ if df is not None and not df.empty:
         else:
             st.warning("Please train and evaluate the model first.")
 
-    with tabs[7]:
-        st.markdown("### ⬇️ Download Results")
+    if st.button("⬇️ Download Results", help="Download the predictions as a CSV file."):
         if 'model' in st.session_state and 'X_test' in st.session_state:
             y_pred = st.session_state['model'].predict(st.session_state['X_test'])
             result_df = pd.DataFrame({'Actual': st.session_state['y_test'], 'Predicted': y_pred})
@@ -263,11 +177,4 @@ if df is not None and not df.empty:
         else:
             st.warning("No results to download.")
 else:
-    st.info("Please upload a dataset or fetch data to begin.")
-
-# --- Custom Footer ---
-st.markdown("""
-<div class='footer'>
-    <b>Developed by [Your Name] | AF3005 – Programming for Finance | <span style='font-size:20px;'>💸</span></b>
-</div>
-""", unsafe_allow_html=True) 
+    st.info("Please upload a dataset or fetch data to begin.") 
