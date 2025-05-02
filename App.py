@@ -32,6 +32,12 @@ st.markdown("""
 
 # --- Sidebar ---
 st.sidebar.title("📊 Data Input")
+st.sidebar.info("""
+You can:
+- Upload your own CSV (from Kaggle or elsewhere)
+- Fetch real-time stock data from Yahoo Finance (enter a valid ticker, e.g., AAPL)
+If Yahoo Finance fetch fails, you can manually download data from [Yahoo Finance](https://finance.yahoo.com/) or [Kaggle Datasets](https://www.kaggle.com/datasets?search=stock+prices) and upload it here.
+""")
 data_source = st.sidebar.radio(
     "Choose data source:",
     ("Upload Kragle Dataset", "Fetch Yahoo Finance Data"),
@@ -62,7 +68,7 @@ else:
                     st.sidebar.success(f"Data for {ticker} loaded!")
                 else:
                     st.session_state["yahoo_df"] = None
-                    st.sidebar.error("No data found for this ticker. Please check the symbol and try again.")
+                    st.sidebar.error("No data found for this ticker. Please check the symbol and try again. You can also manually download from [Yahoo Finance](https://finance.yahoo.com/) or [Kaggle](https://www.kaggle.com/datasets?search=stock+prices) and upload.")
         else:
             st.sidebar.warning("Please enter a ticker symbol.")
     df = st.session_state["yahoo_df"]
@@ -105,9 +111,13 @@ if df is not None and not df.empty:
         if len(numeric_cols) == 0:
             st.warning("No numeric columns found for regression. Please check your data.")
         else:
+            # Case-insensitive search for 'close' column
+            close_candidates = [col for col in numeric_cols if col.lower() == 'close']
+            default_col = close_candidates[0] if close_candidates else numeric_cols[0]
             target_col = st.selectbox(
                 "Select the target column for regression:",
                 options=numeric_cols,
+                index=numeric_cols.index(default_col),
                 help="Choose the column you want to predict (e.g., Close, Adj Close, etc.)"
             )
             if target_col:
