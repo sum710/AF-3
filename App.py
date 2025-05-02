@@ -71,7 +71,7 @@ else:
                     st.sidebar.success(f"Data for {ticker} loaded!")
                 else:
                     st.session_state["yahoo_df"] = None
-                    st.sidebar.error("No data found for this ticker. Please check the symbol and try again. You can also manually download from [Yahoo Finance](https://finance.yahoo.com/) or [Kaggle](https://www.kaggle.com/datasets?search=stock+prices) and upload.")
+                    st.sidebar.error("No data found for this ticker. Please check the symbol and try again.\n\nTroubleshooting tips:\n- Make sure your internet connection is working.\n- Try a well-known ticker like AAPL.\n- If it still fails, update yfinance with 'pip install --upgrade yfinance'.\n- If you are behind a firewall or proxy, try a different network.\n- You can also manually download from [Yahoo Finance](https://finance.yahoo.com/) or [Kaggle](https://www.kaggle.com/datasets?search=stock+prices) and upload.")
         else:
             st.sidebar.warning("Please enter a ticker symbol.")
     df = st.session_state["yahoo_df"]
@@ -81,7 +81,7 @@ st.markdown("""
 # 💸 Financial ML Dashboard
 ---
 """)
-st.image("https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif", width=300)
+st.image("https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif", width=300)
 st.markdown(
     "<span style='color:#1a73e8;font-size:20px'><b>Start by uploading a dataset or fetching stock data from Yahoo Finance.</b></span>",
     unsafe_allow_html=True)
@@ -163,8 +163,7 @@ if df is not None and not df.empty:
                 model.fit(st.session_state['X_train'], st.session_state['y_train'])
                 st.session_state['model'] = model
                 progress.progress(100, text="Model training complete!")
-                st.success("Linear Regression model trained!")
-                st.balloons()
+                st.success("🚀 Model trained! Ready to make financial predictions.")
             else:
                 st.warning("Please split the data first.")
 
@@ -212,5 +211,5 @@ else:
 
 # --- Themed GIF at End ---
 st.markdown("---")
-st.image("https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif", width=200)
+st.image("https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", width=200)
 st.markdown("<span style='color:#1a73e8;font-size:18px'><b>Thank you for using the Financial ML App!</b></span>", unsafe_allow_html=True) 
